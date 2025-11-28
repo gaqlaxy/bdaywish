@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Birthday Constellation ✨</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(
+          ellipse at bottom,
+          #1b2735 0%,
+          #090a0f 100%
+        );
+        min-height: 100vh;
+        overflow: hidden;
+        color: white;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+      }
+
+      /* Twinkling stars background */
+      .stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .star-bg {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 3s infinite;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Welcome screen */
+      .welcome-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        transition: opacity 0.5s ease;
+      }
+
+      .welcome-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .welcome-screen h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+        text-align: center;
+        background: linear-gradient(45deg, #ffd700, #ffed4e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: glow 2s ease-in-out infinite;
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          filter: brightness(1);
+        }
+        50% {
+          filter: brightness(1.5);
+        }
+      }
+
+      .welcome-screen p {
+        font-size: 1.3em;
+        margin-bottom: 30px;
+        text-align: center;
+        opacity: 0.9;
+      }
+
+      .start-btn {
+        padding: 15px 40px;
+        font-size: 1.2em;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .start-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+      }
+
+      /* Interactive constellation stars */
+      .constellation-star {
+        position: absolute;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .star-core {
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(
+          circle,
+          #fff 0%,
+          #ffd700 50%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      .constellation-star:hover .star-core {
+        transform: scale(1.5);
+        filter: brightness(1.5);
+      }
+
+      .constellation-star.clicked .star-core {
+        background: radial-gradient(
+          circle,
+          #ff69b4 0%,
+          #ffd700 50%,
+          transparent 70%
+        );
+        animation: sparkle 1s ease;
+      }
+
+      @keyframes sparkle {
+        0%,
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+        50% {
+          transform: scale(1.5) rotate(180deg);
+        }
+      }
+
+      .star-rays {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+      }
+
+      .ray {
+        position: absolute;
+        width: 2px;
+        height: 15px;
+        background: linear-gradient(to bottom, #ffd700, transparent);
+        top: 50%;
+        left: 50%;
+        transform-origin: center;
+      }
+
+      .ray:nth-child(1) {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      .ray:nth-child(2) {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+      .ray:nth-child(3) {
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+      .ray:nth-child(4) {
+        transform: translate(-50%, -50%) rotate(135deg);
+      }
+
+      /* Message popup */
+      .message-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.95),
+          rgba(118, 75, 162, 0.95)
+        );
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+
+      .message-popup.show {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      .message-popup h2 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ffd700;
+      }
+
+      .message-popup p {
+        font-size: 1.2em;
+        line-height: 1.6;
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .close-popup {
+        display: block;
+        margin: 0 auto;
+        padding: 10px 30px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1em;
+      }
+
+      .close-popup:hover {
+        background: white;
+        color: #764ba2;
+      }
+
+      /* Progress tracker */
+      .progress-bar {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px 30px;
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+        z-index: 50;
+      }
+
+      .progress-text {
+        font-size: 1.1em;
+        text-align: center;
+      }
+
+      .progress-stars {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
+        gap: 5px;
+      }
+
+      .progress-star {
+        font-size: 1.5em;
+        opacity: 0.3;
+        transition: all 0.3s ease;
+      }
+
+      .progress-star.collected {
+        opacity: 1;
+        animation: collect 0.5s ease;
+      }
+
+      @keyframes collect {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Final message */
+      .final-message {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+
+      .final-message.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .final-message h1 {
+        font-size: 3em;
+        margin-bottom: 30px;
+        text-align: center;
+        background: linear-gradient(45deg, #ffd700, #ff69b4, #667eea);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: rainbow 3s ease infinite;
+      }
+
+      @keyframes rainbow {
+        0%,
+        100% {
+          filter: hue-rotate(0deg);
+        }
+        50% {
+          filter: hue-rotate(45deg);
+        }
+      }
+
+      .final-message p {
+        font-size: 1.5em;
+        text-align: center;
+        max-width: 600px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .firework {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        animation: explode 1s ease-out;
+      }
+
+      @keyframes explode {
+        0% {
+          transform: translate(0, 0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--tx), var(--ty));
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .welcome-screen h1 {
+          font-size: 2em;
+        }
+        .welcome-screen p {
+          font-size: 1em;
+        }
+        .message-popup {
+          padding: 30px 20px;
+        }
+        .message-popup h2 {
+          font-size: 1.4em;
+        }
+        .message-popup p {
+          font-size: 1em;
+        }
+        .final-message h1 {
+          font-size: 2em;
+        }
+        .final-message p {
+          font-size: 1.2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Background stars -->
+      <div class="stars" id="starsContainer"></div>
+
+      <!-- Welcome screen -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <h1>✨ Happy Birthday, Sujitha! ✨</h1>
+        <p>
+          I've created a constellation just for you<br />Each star holds a
+          special wish and message
+        </p>
+        <button class="start-btn" id="startBtn">Explore Your Stars</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-bar">
+        <div class="progress-text">
+          Wishes Discovered: <span id="progressCount">0</span>/12
+        </div>
+        <div class="progress-stars" id="progressStars"></div>
+      </div>
+
+      <!-- Constellation stars will be added here -->
+      <div id="constellation"></div>
+
+      <!-- Message popup -->
+      <div class="message-popup" id="messagePopup">
+        <h2 id="messageTitle"></h2>
+        <p id="messageText"></p>
+        <button class="close-popup" id="closePopup">
+          Continue Exploring ✨
+        </button>
+      </div>
+
+      <!-- Final message -->
+      <div class="final-message" id="finalMessage">
+        <h1>🎉 You Found All The Stars! 🎉</h1>
+        <p>Happy Birthday to you!</p>
+        <p>
+          May this year bring you all the happiness, love, and dreams come true
+          that you deserve.
+        </p>
+
+        <p style="margin-top: 30px; font-style: italic">
+          To the new beginnings
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Birthday wishes and messages
+      const wishes = [
+        {
+          title: "A New Beginning ⭐",
+          message:
+            "Life brings unexpected blessings — and you are one of them. I’m truly glad our paths crossed.",
+        },
+        {
+          title: "Our Journey Ahead 🌟",
+          message:
+            "We may just be starting, but I’m excited to discover life with you — one step, one moment at a time.",
+        },
+        {
+          title: "Slow & Beautiful 🌷",
+          message:
+            "Some bonds take time — and that’s the beauty of it. I’m happy to grow this connection with you.",
+        },
+        {
+          title: "A Partner & A Friend 🌠",
+          message:
+            "More than anything, I hope we become great friends — someone we can trust, talk to, and lean on.",
+        },
+        {
+          title: "Your Dreams Matter 🌙",
+          message:
+            "I want to support your dreams, your goals, and everything you aspire to achieve — always.",
+        },
+        {
+          title: "Adventures Await 🚀",
+          message:
+            "Whether small moments or big milestones — I look forward to creating memories together.",
+        },
+        {
+          title: "Perfectly You 🌺",
+          message:
+            "You don’t have to be anything else — just being yourself is more than enough.",
+        },
+        {
+          title: "Our Story 📖",
+          message:
+            "One day, we’ll look back and smile at how beautifully everything came together. Our story is just beginning.",
+        },
+        {
+          title: "A Beautiful Beginning ✨",
+          message:
+            "Every meaningful story starts with a moment — and I’m glad ours has started.",
+        },
+        {
+          title: "Respect & Understanding 🤍",
+          message:
+            "I hope with time we build something strong — with trust, comfort, honesty, and shared laughter.",
+        },
+        {
+          title: "Growing Together 🌿",
+          message:
+            "We may not know everything about each other yet, but I’m looking forward to discovering life—side by side.",
+        },
+        {
+          title: "Birthday Wish 🎂",
+          message:
+            "Wishing you happiness, peace, success, and the most beautiful year ahead. Happy Birthday — to someone truly special. 🎉",
+        },
+      ];
+
+      let collectedStars = 0;
+      const totalStars = wishes.length;
+
+      // Create background stars
+      function createBackgroundStars() {
+        const container = document.getElementById("starsContainer");
+        for (let i = 0; i < 200; i++) {
+          const star = document.createElement("div");
+          star.className = "star-bg";
+          star.style.left = Math.random() * 100 + "%";
+          star.style.top = Math.random() * 100 + "%";
+          star.style.animationDelay = Math.random() * 3 + "s";
+          star.style.animationDuration = Math.random() * 2 + 2 + "s";
+          container.appendChild(star);
+        }
+      }
+
+      // Create constellation stars
+      function createConstellation() {
+        const container = document.getElementById("constellation");
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Create stars in a circular pattern
+        const centerX = width / 2;
+        const centerY = height / 2 + 50;
+        const radius = Math.min(width, height) * 0.35;
+
+        wishes.forEach((wish, index) => {
+          const angle = (index / totalStars) * Math.PI * 2 - Math.PI / 2;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+
+          const star = document.createElement("div");
+          star.className = "constellation-star";
+          star.style.left = x + "px";
+          star.style.top = y + "px";
+          star.dataset.index = index;
+
+          star.innerHTML = `
+                    <div class="star-rays">
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                    </div>
+                    <div class="star-core"></div>
+                `;
+
+          star.addEventListener("click", () => showMessage(index, star));
+          container.appendChild(star);
+        });
+      }
+
+      // Show message popup
+      function showMessage(index, starElement) {
+        if (starElement.classList.contains("clicked")) return;
+
+        const wish = wishes[index];
+        document.getElementById("messageTitle").textContent = wish.title;
+        document.getElementById("messageText").textContent = wish.message;
+        document.getElementById("messagePopup").classList.add("show");
+
+        starElement.classList.add("clicked");
+        collectedStars++;
+        updateProgress();
+
+        // Check if all stars collected
+        if (collectedStars === totalStars) {
+          setTimeout(() => {
+            document.getElementById("finalMessage").classList.add("show");
+            createFireworks();
+          }, 500);
+        }
+      }
+
+      // Close popup
+      document.getElementById("closePopup").addEventListener("click", () => {
+        document.getElementById("messagePopup").classList.remove("show");
+      });
+
+      // Update progress
+      function updateProgress() {
+        document.getElementById("progressCount").textContent = collectedStars;
+        const progressStars = document.getElementById("progressStars");
+        const lastStar = progressStars.children[collectedStars - 1];
+        if (lastStar) {
+          lastStar.classList.add("collected");
+        }
+      }
+
+      // Initialize progress stars
+      function initializeProgress() {
+        const container = document.getElementById("progressStars");
+        for (let i = 0; i < totalStars; i++) {
+          const star = document.createElement("div");
+          star.className = "progress-star";
+          star.textContent = "⭐";
+          container.appendChild(star);
+        }
+      }
+
+      // Create fireworks
+      function createFireworks() {
+        const colors = ["#ffd700", "#ff69b4", "#667eea", "#764ba2", "#00ffff"];
+        for (let i = 0; i < 50; i++) {
+          setTimeout(() => {
+            const firework = document.createElement("div");
+            firework.className = "firework";
+            firework.style.background =
+              colors[Math.floor(Math.random() * colors.length)];
+            firework.style.left = Math.random() * 100 + "%";
+            firework.style.top = Math.random() * 100 + "%";
+
+            const tx = (Math.random() - 0.5) * 300;
+            const ty = (Math.random() - 0.5) * 300;
+            firework.style.setProperty("--tx", tx + "px");
+            firework.style.setProperty("--ty", ty + "px");
+
+            document.body.appendChild(firework);
+
+            setTimeout(() => firework.remove(), 1000);
+          }, i * 50);
+        }
+      }
+
+      // Start button
+      document.getElementById("startBtn").addEventListener("click", () => {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+      });
+
+      // Initialize
+      createBackgroundStars();
+      createConstellation();
+      initializeProgress();
+
+      // Responsive repositioning
+      window.addEventListener("resize", () => {
+        document.getElementById("constellation").innerHTML = "";
+        createConstellation();
+      });
+    </script>
+  </body>
+</html>
